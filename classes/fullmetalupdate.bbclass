@@ -24,7 +24,7 @@ python __anonymous() {
 
     if config_file == d.expand("${LAYER_PATH_lat-layer}/recipes-sota/fullmetalupdate/files/config.cfg.sample"):
         bb.warn('Default config.cfg.sample may not work, please define a new one with HAWKBIT_CONFIG_FILE')
- 
+
     if oe.types.boolean(d.getVar('ENABLE_PUSH_SERVER')):
         hawkbit_user_passwd = d.getVar('HAWKBIT_USER_PASSWORD')
         if not hawkbit_user_passwd:
@@ -94,6 +94,7 @@ ostree_init_if_non_existent() {
     local ostree_repo_mode="$2"
 
     if [ ! -d ${ostree_repo} ]; then
+        bbnote "init ostree repo"
         mkdir -p ${ostree_repo}
         ostree_init ${ostree_repo} ${ostree_repo_mode}
     fi
@@ -120,17 +121,34 @@ ostree_pull_mirror() {
     local ostree_branch="$2"
     local ostree_depth="$3"
     local ostree_maxretry="$4"
-    local lookup="Timeout"
+    local lookup_timeout="Timeout"
+    local loopkup_notfound="Not Found"
     local counter_retry=0
 
-    $(ostree pull ${ostree_branch} ${ostree_branch} --depth=${ostree_depth} --mirror --repo=${ostree_repo} 2>&1 | grep -q ${lookup}) 
-
-    while ! test $? -gt 0 && [ ${counter_retry} -le ${ostree_maxretry} ]
-    do 
-        counter_retry=$(expr $counter_retry + 1)
-        bbnote "OsTree pull counter retry: ${counter_retry}"
-        $(ostree pull ${ostree_branch} ${ostree_branch} --depth=${ostree_depth} --mirror --repo=${ostree_repo} 2>&1 | grep -q ${lookup}) 
-	done 
+    msg=$(ostree pull ${ostree_branch} ${ostree_branch} --depth=${ostree_depth} --mirror --repo=${ostree_repo} 2>&1)
+    if [ $? -eq 0 ]; then
+        bbnote "OsTree pull successfully"
+        return 0
+    elif echo "$msg" | grep -q "${loopkup_notfound}"; then
+        bbnote "OsTree remote branch not exist"
+        return 0
+    elif echo "$msg" | grep -q "${lookup_timeout}"; then
+        while ! test $? -gt 0 && [ ${counter_retry} -le ${ostree_maxretry} ]
+        do
+            counter_retry=$(expr $counter_retry + 1)
+            bbnote "OsTree pull counter retry: ${counter_retry}"
+            msg=$(ostree pull ${ostree_branch} ${ostree_branch} --depth=${ostree_depth} --mirror --repo=${ostree_repo} 2>&1)
+            if [ $? -eq 0 ]; then
+                bbnote "OsTree pull successfully"
+                return 0
+            else
+                echo "${msg}" | grep -q "${lookup_timeout}"
+            fi
+        done
+        bbfatal "OsTree pull failed since ${msg}"
+    else
+        bbfatal "OsTree pull failed since ${msg}"
+    fi
 }
 
 ostree_revparse() {
@@ -144,7 +162,7 @@ ostree_remote_add() {
     local ostree_repo="$1"
     local ostree_branch="$2"
     local ostree_http_address="$3"
-
+    bbnote "remote add $ostree_branch"
     ostree remote add --no-gpg-verify ${ostree_branch} ${ostree_http_address} --repo=${ostree_repo}
 }
 
@@ -153,6 +171,23 @@ ostree_remote_delete() {
     local ostree_branch="$2"
 
     ostree remote delete ${ostree_branch} --repo=${ostree_repo}
+}
+
+ostree_remote_update() {
+   local ostree_repo="$1"
+   local ostree_branch="$2"
+   local ostree_http_address="$3"
+
+   if ! ostree_is_remote_present ${ostree_repo} ${ostree_branch}; then
+       ostree_remote_add ${ostree_repo} ${ostree_branch} ${ostree_http_address}
+   else
+       local current_url=$(ostree remote show-url ${ostree_branch} --repo ${ostree_repo})
+       if [ "${current_url}" != "${ostree_http_address}" ];  then
+           bbnote "Remote $ostree_branch url update from ${current_url} to ${ostree_http_address}"
+           ostree_remote_delete ${ostree_repo} ${ostree_branch}
+           ostree_remote_add ${ostree_repo} ${ostree_branch} ${ostree_http_address}
+       fi
+   fi
 }
 
 ostree_is_remote_present() {

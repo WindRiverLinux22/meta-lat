@@ -28,12 +28,11 @@ do_pull_remote_ostree_image() {
     ostree_init_if_non_existent ${OSTREE_REPO} archive-z2
 
     # Add missing remotes
-    ostree_remote_add_if_not_present ${OSTREE_REPO} ${OSTREE_BRANCHNAME} ${OSTREE_HTTP_ADDRESS}
+    ostree_remote_update ${OSTREE_REPO} ${OSTREE_BRANCHNAME} ${OSTREE_HTTP_ADDRESS}
 
     #Pull locally the remote repo
-    set +e
-    # Ignore error for this command, since the remote repo could be empty and we have no way to know
     bbnote "Pull locally the repository: ${OSTREE_BRANCHNAME}"
+    set +e
     ostree_pull_mirror ${OSTREE_REPO} ${OSTREE_BRANCHNAME} ${OSTREE_MIRROR_PULL_DEPTH} ${OSTREE_MIRROR_PULL_RETRIES}
     set -e
 }

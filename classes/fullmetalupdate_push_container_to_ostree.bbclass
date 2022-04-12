@@ -28,13 +28,12 @@ do_push_container_to_ostree_and_hawkbit() {
 
     ostree_init_if_non_existent ${OSTREE_REPO_CONTAINERS} archive-z2
 
-    # Add missing remotes
-    ostree_remote_add_if_not_present ${OSTREE_REPO_CONTAINERS} ${OSTREE_PACKAGE_BRANCHNAME} ${OSTREE_HTTP_ADDRESS}
+    # update missing remotes
+    ostree_remote_update ${OSTREE_REPO_CONTAINERS} ${OSTREE_PACKAGE_BRANCHNAME} ${OSTREE_HTTP_ADDRESS}
 
     #Pull locally the remote repo
-    set +e
-    # Ignore error for this command, since the remote repo could be empty and we have no way to know
     bbnote "Pull locally the repository: ${OSTREE_PACKAGE_BRANCHNAME}"
+    set +e
     ostree_pull_mirror ${OSTREE_REPO_CONTAINERS} ${OSTREE_PACKAGE_BRANCHNAME} ${OSTREE_MIRROR_PULL_DEPTH} ${OSTREE_MIRROR_PULL_RETRIES}
     set -e
 
