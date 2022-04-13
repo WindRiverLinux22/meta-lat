@@ -59,7 +59,7 @@ do_push_container_to_ostree_and_hawkbit() {
     hawkbit_metadata_revparse=$(hawkbit_metadata_value 'rev' ${OSTREE_REVPARSE})
     hawkbit_metadata_autostart=$(hawkbit_metadata_value 'autostart' ${AUTOSTART})
     hawkbit_metadata_screenused=$(hawkbit_metadata_value 'screenused' ${SCREENUSED})
-    hawkbit_metadata_autoremove=$(hawkbit_metadata_value 'autoremoved' ${AUTOREMOVE})
+    hawkbit_metadata_autoremove=$(hawkbit_metadata_value 'autoremove' ${AUTOREMOVE})
     test -z ${NOTIFY} || hawkbit_metadata_notify=$(hawkbit_metadata_value 'notify' ${NOTIFY})
     test -z ${TIMEOUT} || hawkbit_metadata_timeout=$(hawkbit_metadata_value 'timeout' ${TIMEOUT})
 
