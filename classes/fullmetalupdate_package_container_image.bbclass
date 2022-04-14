@@ -26,6 +26,11 @@ IMAGE_INSTALL:remove = "\
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'u-boot u-boot-uenv', '', d)} \
     ${@bb.utils.contains('IMAGE_ENABLE_CONTAINER', '1', 'os-release', '', d)} \
 "
+
+do_rootfs[file-checksums] += "${CONTAINER_STARTUP}:True \
+                              ${RUNC_CONFIG}:True \
+                              ${SYSTEMD_CONFIG}:True"
+
 #
 # A hook function to shrink oci images generates by yocto
 #
