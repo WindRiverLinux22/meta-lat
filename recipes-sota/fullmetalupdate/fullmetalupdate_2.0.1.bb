@@ -50,7 +50,12 @@ do_install() {
     cp -r --no-dereference --preserve=mode,links -v ${WORKDIR}/git/* ${D}${base_bindir}/fullmetalupdate/
     rm -rf ${D}${base_bindir}/fullmetalupdate/.git/
 
-    install -d ${D}/${APP_DIRECTORY}
+    if ${@bb.utils.contains('DISTRO_FEATURES', 'ostree', 'true', 'false', d)}; then
+        install -d ${D}/var${APP_DIRECTORY}
+        cd ${D}; ln -sf var${APP_DIRECTORY} ./${APP_DIRECTORY}
+    else
+        install -d ${D}/${APP_DIRECTORY}
+    fi
     install -d ${D}${sysconfdir}/fullmetalupdate
    
     install -m 755 ${HAWKBIT_CONFIG_FILE} ${D}${sysconfdir}/fullmetalupdate/config.cfg
