@@ -39,6 +39,7 @@ oci_tarball_creation_hook() {
         mkdir -p ${CONTAINERS_DIRECTORY}
 
         bbnote "Creating a New rootfs folder for container : ${CONTAINER_IMAGE_ROOTFS}"
+        rm -rf ${CONTAINER_IMAGE_ROOTFS}
         mkdir -p "${CONTAINER_IMAGE_ROOTFS}"
 
         bbnote "Copying old rootfs to ${CONTAINER_IMAGE_ROOTFS}"
