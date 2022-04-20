@@ -194,7 +194,13 @@ ostree_is_remote_present() {
     local ostree_repo="$1"
     local ostree_branch="$2"
 
-    ostree remote list --repo=${ostree_repo} | grep -q ${ostree_branch}
+    for line in $(ostree remote list --repo=${ostree_repo})
+    do
+        if [ "${line}" =  "${ostree_branch}" ]; then
+            return 0
+        fi
+    done
+    return 1
 }
 
 ostree_remote_add_if_not_present() {
