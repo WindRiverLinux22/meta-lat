@@ -375,13 +375,14 @@ python __anonymous () {
                                       d.getVar('RPM_PACKAGE_FEED_BASE_PATHS') or "",
                                       d.getVar('RPM_PACKAGE_FEED_ARCHS'))
     d.setVar("DEFAULT_RPM_PACKAGE_FEED", remote_rpm_uris)
-    d.setVar("REMOTE_RPM_PKGDATADIR", d.expand("${RPM_PACKAGE_FEED_URIS}/${RPM_PACKAGE_FEED_BASE_PATHS}"))
+    if not d.getVar('REMOTE_RPM_PKGDATADIR'):
+        d.setVar("REMOTE_RPM_PKGDATADIR", d.expand("${@d.getVar('RPM_PACKAGE_FEED_URIS').split()[0]}/${RPM_PACKAGE_FEED_BASE_PATHS}"))
 
     if d.getVar('DEB_PACKAGE_FEED_URIS'):
         remote_deb_uris = get_remote_uris(d.getVar('DEB_PACKAGE_FEED_URIS') or "",
                                           d.getVar('DEB_PACKAGE_FEED_BASE_PATHS') or "",
                                           d.getVar('DEB_PACKAGE_FEED_ARCHS'))
         d.setVar("DEFAULT_DEB_PACKAGE_FEED", remote_deb_uris)
-        d.setVar("REMOTE_DEB_PKGDATADIR", d.expand("${DEB_PACKAGE_FEED_URIS}/${DEB_PACKAGE_FEED_BASE_PATHS}"))
+        d.setVar("REMOTE_DEB_PKGDATADIR", d.expand("${@d.getVar('DEB_PACKAGE_FEED_URIS').split()[0]}/${DEB_PACKAGE_FEED_BASE_PATHS}"))
 
 }
