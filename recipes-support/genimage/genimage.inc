@@ -114,6 +114,7 @@ SRC_URI = "\
            file://genimage/doc/target_nxp-lx2xxx.README.md.in \
            file://genimage/doc/target_axxiaarm64.README.md.in \
            file://genimage/doc/target_axxiaarm.README.md.in \
+           file://genimage/doc/target_amd-snowyowl-64.README.md.in \
            file://METADATA.in \
            file://README.md \
            file://setup.py \
@@ -345,6 +346,8 @@ python __anonymous () {
         d.setVar('RPM_PACKAGE_FEED_ARCHS', 'cortexa57 noarch axxiaarm64')
     elif machine == 'axxiaarm':
         d.setVar('RPM_PACKAGE_FEED_ARCHS', 'cortexa15t2_neon noarch axxiaarm')
+    elif machine == 'amd-snowyowl-64':
+        d.setVar('RPM_PACKAGE_FEED_ARCHS', 'dbfp5 noarch amd_snowyowl_64')
     elif machine == 'intel-x86-64':
         d.setVar('RPM_PACKAGE_FEED_ARCHS', 'corei7_64 intel_x86_64 noarch')
         d.setVar('DEB_PACKAGE_FEED_ARCHS', 'corei7-64 intel_x86_64 all')
