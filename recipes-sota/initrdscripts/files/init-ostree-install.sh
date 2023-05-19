@@ -577,7 +577,7 @@ fatal() {
     fi
     if [ "$INSTPOST" = "exit" ] ; then exit 1 ; fi
 
-    echo "Install failed, starting boot shell.  System will reboot on exit"
+    echo "Installation failed, starting boot shell. System will reboot on exit "
     echo "You can execute the install with verbose message:"
     echo "     INSTSH=0 bash -v -x /install"
     shell_start exec
@@ -1654,7 +1654,7 @@ done
 if [ -e /install.log ]; then
     datetime=$(date +%y%m%d-%H%M%S)
     oklog="install-$datetime.log"
-    echo "Save $oklog to installed /var"
+    echo "Save $oklog to /var"
     sleep 2
     cp /install.log /var1/$oklog
     chmod 644 /var1/$oklog
